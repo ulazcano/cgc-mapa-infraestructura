@@ -191,11 +191,81 @@ troncalesLayer.addTo(map);
 wellsLayer.addTo(map);
 subsLayer.addTo(map);
 
+// 14x14 km surveillance grid
+const gridLayer=L.layerGroup();
+const towerLayer=L.layerGroup();
+
+// Calculate grid bounds from well positions
+const allLats=wells.map(w=>w.la);
+const allLons=wells.map(w=>w.lo);
+const minLat=Math.min(...allLats)-0.05;
+const maxLat=Math.max(...allLats)+0.05;
+const minLon=Math.min(...allLons)-0.05;
+const maxLon=Math.max(...allLons)+0.05;
+
+// 14 km in degrees (approximate at lat -47)
+const kmPerDegLat=111.32;
+const kmPerDegLon=111.32*Math.cos(-47*Math.PI/180);
+const stepLat=14/kmPerDegLat;
+const stepLon=14/kmPerDegLon;
+
+// Draw grid lines and count wells per cell
+const cellData={};
+for(let lat=minLat;lat<=maxLat;lat+=stepLat){
+  L.polyline([[lat,minLon],[lat,maxLon]],{color:'#ffffff',weight:0.6,opacity:0.25,dashArray:'6,8'}).addTo(gridLayer);
+}
+for(let lon=minLon;lon<=maxLon;lon+=stepLon){
+  L.polyline([[minLat,lon],[maxLat,lon]],{color:'#ffffff',weight:0.6,opacity:0.25,dashArray:'6,8'}).addTo(gridLayer);
+}
+
+// Count wells per cell and place tower markers at cell centers
+for(let lat=minLat;lat<maxLat;lat+=stepLat){
+  for(let lon=minLon;lon<maxLon;lon+=stepLon){
+    const cLat=lat+stepLat/2;
+    const cLon=lon+stepLon/2;
+    const count=wells.filter(w=>w.la>=lat&&w.la<lat+stepLat&&w.lo>=lon&&w.lo<lon+stepLon).length;
+    if(count>0){
+      // Cell has wells — place tower marker
+      const radius=7;
+      L.circleMarker([cLat,cLon],{
+        radius:radius,
+        fillColor:'rgba(255,255,255,0.12)',
+        color:'#ffffff',
+        weight:1.2,
+        opacity:0.5,
+        fillOpacity:0.08
+      }).addTo(gridLayer);
+      // Tower icon
+      L.marker([cLat,cLon],{
+        icon:L.divIcon({
+          className:'',
+          html:'<div style="width:10px;height:10px;border:2px solid rgba(255,200,0,0.8);border-radius:50%;background:rgba(255,200,0,0.15);box-shadow:0 0 12px rgba(255,200,0,0.3)"></div>',
+          iconSize:[10,10],iconAnchor:[5,5]
+        })
+      }).bindPopup(
+        '<b>Celda de vigilancia 14×14 km</b><br>'+
+        '<b>Pozos en esta celda:</b> '+count+'<br>'+
+        '<b>Radio de cobertura radar:</b> ~7 km (Blighter B402 90°) a ~20 km (B442 360°)<br>'+
+        '<b>Ubicacion sugerida torre:</b> '+cLat.toFixed(4)+'°, '+cLon.toFixed(4)+'°<br>'+
+        '<span style="font-size:11px;color:#888">Un radar en el centro de esta celda cubre toda la celda con margen</span>',
+        {maxWidth:280}
+      ).addTo(towerLayer);
+    }
+  }
+}
+
+ramalesLayer.addTo(map);
+troncalesLayer.addTo(map);
+wellsLayer.addTo(map);
+subsLayer.addTo(map);
+
 const baseMaps={
   'Satelite':satelliteLayer,
   'Mapa Oscuro':darkLayer
 };
 const overlays={
+  'Grilla 14×14 km':gridLayer,
+  'Torres sugeridas':towerLayer,
   'Tramos troncales (672)':troncalesLayer,
   'Ramales':ramalesLayer,
   'Pozos (1.505)':wellsLayer,
@@ -204,6 +274,8 @@ const overlays={
 };
 L.control.layers(baseMaps,overlays,{collapsed:false,position:'topright'}).addTo(map);
 labelsLayer.addTo(map);
+gridLayer.addTo(map);
+towerLayer.addTo(map);
 </script>
 </body>
 </html>
