@@ -127,9 +127,9 @@ const subsLayer=L.layerGroup();
 // Draw edges — ramales first, then troncales on top
 edges.forEach(e=>{
   const isTrunk=e.tr;
-  const color=isTrunk?'#e63946':'#4cc9f0';
-  const weight=isTrunk?Math.min(1.5+e.dw*0.08,5):1;
-  const opacity=isTrunk?0.7:0.3;
+  const color=isTrunk?'#ff2d55':'#00e5ff';
+  const weight=isTrunk?Math.min(3+e.dw*0.12,8):2;
+  const opacity=isTrunk?0.9:0.55;
   
   const line=L.polyline([[e.fla,e.flo],[e.tla,e.tlo]],{
     color:color,weight:weight,opacity:opacity
