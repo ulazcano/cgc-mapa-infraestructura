@@ -150,11 +150,20 @@ TH.forEach(t=>{
   ).addTo(ly.th);
 });
 
+// 14x14 km surveillance grid
+ly['grd']=L.layerGroup();
+const aL=W.map(w=>w.la),aO=W.map(w=>w.lo);
+const mL=Math.min(...aL)-0.05,xL=Math.max(...aL)+0.05,mO=Math.min(...aO)-0.05,xO=Math.max(...aO)+0.05;
+const sL=14/111.32,sO=14/(111.32*Math.cos(-47*Math.PI/180));
+for(let la=mL;la<=xL;la+=sL) L.polyline([[la,mO],[la,xO]],{color:'#fff',weight:1.5,opacity:0.45,dashArray:'8,6'}).addTo(ly.grd);
+for(let lo=mO;lo<=xO;lo+=sO) L.polyline([[mL,lo],[xL,lo]],{color:'#fff',weight:1.5,opacity:0.45,dashArray:'8,6'}).addTo(ly.grd);
+
 ly.th.addTo(map);
 ly.l66.addTo(map);ly.l132.addTo(map);ly.l220.addTo(map);ly.l500.addTo(map);
 ly.mt13.addTo(map);ly.mt33.addTo(map);
 ly.cs.addTo(map);ly.cm.addTo(map);
 ly.ss.addTo(map);ly.is.addTo(map);ly.dn.addTo(map);ly.wl.addTo(map);
+ly.grd.addTo(map);
 lb.addTo(map);
 
 L.control.layers(
@@ -167,7 +176,7 @@ L.control.layers(
     'SET SADI (322)':ly.ss,'SET Ind (24)':ly.is,
     'Nodos MT (162)':ly.dn,
     'Robos documentados (20)':ly.th,
-    'Pozos CGC (1505)':ly.wl,'Nombres':lb
+    'Pozos CGC (1505)':ly.wl,'Grilla 14x14 km':ly.grd,'Nombres':lb
   },
   {collapsed:true,position:'topright'}
 ).addTo(map);
