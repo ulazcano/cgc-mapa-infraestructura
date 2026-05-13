@@ -212,10 +212,10 @@ const stepLon=14/kmPerDegLon;
 // Draw grid lines and count wells per cell
 const cellData={};
 for(let lat=minLat;lat<=maxLat;lat+=stepLat){
-  L.polyline([[lat,minLon],[lat,maxLon]],{color:'#ffffff',weight:0.6,opacity:0.25,dashArray:'6,8'}).addTo(gridLayer);
+  L.polyline([[lat,minLon],[lat,maxLon]],{color:'#ffffff',weight:1.5,opacity:0.45,dashArray:'8,6'}).addTo(gridLayer);
 }
 for(let lon=minLon;lon<=maxLon;lon+=stepLon){
-  L.polyline([[minLat,lon],[maxLat,lon]],{color:'#ffffff',weight:0.6,opacity:0.25,dashArray:'6,8'}).addTo(gridLayer);
+  L.polyline([[minLat,lon],[maxLat,lon]],{color:'#ffffff',weight:1.5,opacity:0.45,dashArray:'8,6'}).addTo(gridLayer);
 }
 
 // Count wells per cell and place tower markers at cell centers
